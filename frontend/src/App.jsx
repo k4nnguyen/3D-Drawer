@@ -41,6 +41,22 @@ const SunIcon = () => (
   </svg>
 );
 
+const MaximizeIcon = () => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+  </svg>
+);
+
 function App() {
   const [theme, setTheme] = useState("dark");
   const [messages, setMessages] = useState([
@@ -55,11 +71,16 @@ function App() {
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [fullscreenPlotIndex, setFullscreenPlotIndex] = useState(null);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isLoading]);
+
+  const toggleFullscreen = (index) => {
+    setFullscreenPlotIndex(fullscreenPlotIndex === index ? null : index);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -268,6 +289,7 @@ function App() {
             }
 
             .plot-container {
+              position: relative;
               align-self: center;
               width: 95%;
               max-width: 1000px;
@@ -282,6 +304,47 @@ function App() {
               animation: slideInFadeIn 0.4s ease-out forwards;
               /* keep plot from shrinking */
               flex: 0 0 auto;
+            }
+
+            .plot-container.fullscreen {
+              position: fixed;
+              top: 0;
+              left: 0;
+              width: 100vw;
+              height: 100vh;
+              max-width: 100vw;
+              max-height: 100vh;
+              border-radius: 0;
+              margin: 0;
+              z-index: 9999;
+            }
+
+            .zoom-button {
+              position: absolute;
+              top: 10px;
+              right: 10px;
+              background-color: rgba(0, 123, 255, 0.9);
+              color: white;
+              border: none;
+              border-radius: 8px;
+              padding: 0.5rem 1rem;
+              cursor: pointer;
+              font-size: 0.9rem;
+              display: flex;
+              align-items: center;
+              gap: 0.4rem;
+              z-index: 10;
+              transition: background-color 0.2s, transform 0.1s;
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            }
+
+            .zoom-button:hover {
+              background-color: rgba(0, 123, 255, 1);
+              transform: scale(1.05);
+            }
+
+            .zoom-button:active {
+              transform: scale(0.95);
             }
 
             .plot-iframe { width: 100%; height: 100%; border: none; display: block; }
@@ -360,7 +423,24 @@ function App() {
           {messages.map((msg, index) => {
             if (msg.sender === "plot") {
               return (
-                <div key={index} className="plot-container">
+                <div
+                  key={index}
+                  className={`plot-container ${
+                    fullscreenPlotIndex === index ? "fullscreen" : ""
+                  }`}
+                >
+                  <button
+                    className="zoom-button"
+                    onClick={() => toggleFullscreen(index)}
+                    title={
+                      fullscreenPlotIndex === index
+                        ? "Thoát toàn màn hình"
+                        : "Phóng to toàn màn hình"
+                    }
+                  >
+                    <MaximizeIcon />
+                    {fullscreenPlotIndex === index ? "Thu nhỏ" : "Zoom"}
+                  </button>
                   <iframe
                     title={`plot-${index}`}
                     srcDoc={msg.html}
