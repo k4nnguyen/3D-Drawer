@@ -1,0 +1,234 @@
+/* --- Cài đặt chung & Biến màu --- */
+:root {
+  --light-bg: #f5f5f5;
+  --light-text: #1a1a1a;
+  --light-header-bg: #ffffff;
+  --light-border: #ddd;
+  --light-bot-message-bg: #e9e9eb;
+  --light-input-bg: #f0f0f0;
+
+  --dark-bg: #1a1a1a;
+  --dark-text: #f5f5f5;
+  --dark-header-bg: #242424;
+  --dark-border: #333;
+  --dark-bot-message-bg: #333;
+  --dark-input-bg: #333;
+
+  --primary-color: #007bff;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* --- Cấu trúc Layout chính --- */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+  transition: background-color 0.3s, color 0.3s;
+  overflow: hidden; /* FIX: Ngăn toàn bộ trang bị cuộn */
+}
+
+/* --- Chế độ Sáng/Tối (Light/Dark Theme) --- */
+.app-container.light {
+  background-color: var(--light-bg);
+  color: var(--light-text);
+}
+
+.app-container.dark {
+  background-color: var(--dark-bg);
+  color: var(--dark-text);
+}
+
+/* --- Header --- */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid;
+  transition: background-color 0.3s, border-bottom 0.3s;
+  flex-shrink: 0; /* FIX: Ngăn header bị co lại */
+}
+
+.app-container.light .header {
+  background-color: var(--light-header-bg);
+  border-bottom-color: var(--light-border);
+}
+.app-container.dark .header {
+  background-color: var(--dark-header-bg);
+  border-bottom-color: var(--dark-border);
+}
+
+.title {
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.theme-toggle-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.app-container.light .theme-toggle-button {
+  color: var(--light-text);
+}
+.app-container.dark .theme-toggle-button {
+  color: var(--dark-text);
+}
+
+/* --- Khung tin nhắn --- */
+.messages-container {
+  flex-grow: 1; /* FIX: Cho phép nó lấp đầy không gian còn lại */
+  overflow-y: auto; /* FIX: Bật thanh cuộn khi cần */
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 0; /* Cực kỳ quan trọng để thanh cuộn hoạt động trong Flexbox */
+}
+
+.message {
+  max-width: 70%;
+  padding: 0.75rem 1rem;
+  border-radius: 18px;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+  animation: slideInFadeIn 0.4s ease-out forwards;
+  word-wrap: break-word;
+}
+
+.user-message {
+  background-color: var(--primary-color);
+  color: white;
+  align-self: flex-end;
+}
+
+.bot-message {
+  align-self: flex-start;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.app-container.light .bot-message {
+  background-color: var(--light-bot-message-bg);
+  color: var(--light-text);
+}
+.app-container.dark .bot-message {
+  background-color: var(--dark-bot-message-bg);
+  color: var(--dark-text);
+}
+
+/* --- Khung hiển thị 3D Plot --- */
+.plot-container {
+  align-self: center;
+  width: 95%;
+  max-width: 800px;
+  height: 600px;
+  background-color: #fff;
+  border-radius: 12px;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+  animation: slideInFadeIn 0.4s ease-out forwards;
+}
+
+.plot-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* --- Form nhập liệu --- */
+.input-form {
+  display: flex;
+  padding: 1rem;
+  border-top: 1px solid;
+  transition: background-color 0.3s, border-top 0.3s;
+  flex-shrink: 0; /* FIX: Ngăn form bị co lại */
+}
+.app-container.light .input-form {
+  background-color: var(--light-header-bg);
+  border-top-color: var(--light-border);
+}
+.app-container.dark .input-form {
+  background-color: var(--dark-header-bg);
+  border-top-color: var(--dark-border);
+}
+
+.input {
+  flex: 1;
+  padding: 0.75rem;
+  border-radius: 20px;
+  border: 1px solid;
+  font-size: 1rem;
+  margin-right: 0.5rem;
+  transition: background-color 0.3s, color 0.3s, border 0.3s;
+}
+.app-container.light .input {
+  border-color: #ccc;
+  background-color: var(--light-input-bg);
+  color: var(--light-text);
+}
+.app-container.dark .input {
+  border-color: #444;
+  background-color: var(--dark-input-bg);
+  color: var(--dark-text);
+}
+
+.button {
+  padding: 0.75rem 1.5rem;
+  border-radius: 20px;
+  border: none;
+  background-color: var(--primary-color);
+  color: white;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* --- Hoạt ảnh (Animations) --- */
+@keyframes slideInFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.loading span {
+  animation: pulse 1.4s infinite;
+}
+.loading span:nth-child(1) {
+  animation-delay: 0s;
+}
+.loading span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+.loading span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes pulse {
+  0%,
+  80%,
+  100% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+}
