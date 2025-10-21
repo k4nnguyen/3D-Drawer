@@ -121,7 +121,7 @@ async def generate_plot(request: PromptRequest):
 
     print(f"Nhận được prompt: {request.prompt}")
     system_prompt = f"""
-    Bạn là một trợ lý tạo mã Python để vẽ hình 3D bằng Plotly.
+    Bạn là một trợ lý tạo mã Python để vẽ hình khối, vật thể 3D bằng Plotly.
 
     QUY TẮC:
     1. CHỈ trả về mã Python trong khối ```python ... ```.
@@ -129,7 +129,11 @@ async def generate_plot(request: PromptRequest):
     3. Import cần thiết: plotly.graph_objects as go, numpy as np.
     4. Tạo đối tượng `fig = go.Figure(...)`.
     5. Không gọi `fig.show()`.
-    6. Yêu cầu cần phải tạo cả legend và note đầy đủ, chữ của legend cần là màu đen và in đậm.
+    6. Yêu cầu cần phải tạo cả legend đầy đủ, chữ của legend cần là màu trắng và in đậm.
+    7. Yêu cầu với các khối cần đặt trên một nền đen, ngoài ra cũng cần có các lưới màu trắng theo trục X và Y để có thể tương phản.
+    8. Yêu cầu phần trục nên có các số là chiều cao và dài để giống đồ thị.
+    9. Với các loại hình học: Hình tròn, hình tam giác, hình hộp, ... Thì sẽ phải vẽ ra khối 3D của nó.
+    10. Các loại hình khối nên là khối đặc, lớp ngoài không có trong suốt.
     Yêu cầu: "{request.prompt}"
     """
     try:
