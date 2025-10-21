@@ -215,10 +215,16 @@ function App() {
             .app-container.light .header {
               background-color: var(--light-header-bg);
               border-bottom-color: var(--light-border);
+              padding: 20px;
+              border-radius: 5px;
+              opacity: 90%;
             }
             .app-container.dark .header {
               background-color: var(--dark-header-bg);
               border-bottom-color: var(--dark-border);
+              padding: 20px;
+              border-radius: 5px;
+              opacity: 90%;
             }
 
             .title { margin: 0; font-size: 1.5rem; }
@@ -266,24 +272,36 @@ function App() {
             }
 
             .message {
+
               padding: 0.75rem 1rem;
               border-radius: 18px;
               line-height: 1.4;
-              animation: slideInFadeIn 0.4s ease-out forwards;
+              animation: slideInFadeIn 0.4s ease-out;
               word-wrap: break-word;
               flex: 1;
+              transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+              cursor: pointer;
             }
 
             .user-message {
               background-color: var(--primary-color);
               color: white;
+              transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+            }
+
+            .user-message:hover {
+              transform: translateY(-5px) !important;
+              box-shadow: 0 8px 24px rgba(0, 123, 255, 0.4) !important;
             }
 
             .bot-message {
-              transition: background-color 0.3s, color 0.3s;
+              transition: background-color 0.3s, color 0.3s, transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
             }
 
-            .app-container.light .bot-message {
+            .bot-message:hover {
+              transform: translateY(-5px) !important;
+              box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2) !important;
+            }            .app-container.light .bot-message {
               background-color: var(--light-bot-message-bg);
               color: var(--light-text);
             }
