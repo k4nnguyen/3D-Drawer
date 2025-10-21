@@ -101,27 +101,31 @@ function App() {
       const data = await response.json();
 
       if (response.ok && data.html) {
-        // SỬA LỖI: Thêm CSS để ghi đè chiều cao cố định của Plotly
+        // SỬA LỖI: Đảm bảo canvas Plotly full màn hình trong iframe
         const fullHtml = `
                   <html>
                     <head>
                       <meta name="viewport" content="width=device-width, initial-scale=1" />
                       <style>
-                        /* Allow the plot to size to the iframe and allow internal scroll if plot is taller */
                         html, body {
                           margin: 0;
                           padding: 0;
-                          width: 100%;
-                          height: 100%;
+                          width: 100vw;
+                          height: 100vh;
+                          min-width: 100vw;
+                          min-height: 100vh;
                           box-sizing: border-box;
+                          background-color: transparent !important;
                         }
-                        /* Make common Plotly containers fill available space */
                         .plotly, .js-plotly-plot, .main-svg, .svg-container, .plot-container {
-                          width: 100% !important;
-                          height: 100% !important;
-                          min-height: 100% !important;
+                          width: 100vw !important;
+                          height: 100vh !important;
+                          min-width: 100vw !important;
+                          min-height: 100vh !important;
                         }
-                        /* Allow the iframe to add its own scrollbar if necessary */
+                        .js-plotly-plot, .plot-container, .svg-container {
+                          background: transparent !important;
+                        }
                         body > div { box-sizing: border-box; }
                       </style>
                     </head>
@@ -306,6 +310,10 @@ function App() {
               flex: 0 0 auto;
             }
 
+            /* Theme-based container background so transparent iframe looks correct */
+            .app-container.dark .plot-container { background-color: #000; }
+            .app-container.light .plot-container { background-color: #fff; }
+
             .plot-container.fullscreen {
               position: fixed;
               top: 0;
@@ -321,7 +329,7 @@ function App() {
 
             .zoom-button {
               position: absolute;
-              top: 10px;
+              top: 45px;
               right: 10px;
               background-color: rgba(0, 123, 255, 0.9);
               color: white;
