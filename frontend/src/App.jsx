@@ -557,11 +557,34 @@ function App() {
                         <button
                           style={{
                             marginTop: "0.5rem",
-                            padding: "0.3rem 0.8rem",
-                            borderRadius: "6px",
-                            border: "1px solid #bbb",
-                            background: "#f0f0f0",
+                            padding: "0.5rem 1rem",
+                            borderRadius: "8px",
+                            border: "none",
+                            background:
+                              "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                            color: "white",
                             cursor: "pointer",
+                            fontSize: "0.95rem",
+                            fontWeight: "500",
+                            boxShadow: "0 4px 15px rgba(102, 126, 234, 0.4)",
+                            transition: "all 0.3s ease",
+                            transform:
+                              showCodeIndex === index
+                                ? "scale(0.95)"
+                                : "scale(1)",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = "scale(1.05)";
+                            e.currentTarget.style.boxShadow =
+                              "0 6px 20px rgba(102, 126, 234, 0.6)";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform =
+                              showCodeIndex === index
+                                ? "scale(0.95)"
+                                : "scale(1)";
+                            e.currentTarget.style.boxShadow =
+                              "0 4px 15px rgba(102, 126, 234, 0.4)";
                           }}
                           onClick={() =>
                             setShowCodeIndex(
