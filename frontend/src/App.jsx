@@ -385,6 +385,7 @@ function App() {
               animation: slideInFadeIn 0.4s ease-out forwards;
               /* keep plot from shrinking */
               flex: 0 0 auto;
+              transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             }
 
             /* Theme-based container background so transparent iframe looks correct */
@@ -402,6 +403,7 @@ function App() {
               border-radius: 0;
               margin: 0;
               z-index: 9999;
+              transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             }
 
             .zoom-button {
@@ -432,7 +434,13 @@ function App() {
               transform: scale(0.95);
             }
 
-            .plot-iframe { width: 100%; height: 100%; border: none; display: block; }
+            .plot-iframe { 
+              width: 100%; 
+              height: 100%; 
+              border: none; 
+              display: block;
+              transition: opacity 0.3s ease;
+            }
 
             .input-form {
               display: flex;
@@ -616,40 +624,13 @@ function App() {
                 </div>
               );
             }
-            // Hiển thị trạng thái khi đang loading (sinh code)
+            // Bỏ qua user message cuối nếu đang loading (sẽ render riêng với loading)
             if (
               isLoading &&
-              !messages.some((m) => m.sender === "plot") &&
               index === messages.length - 1 &&
               msg.sender === "user"
             ) {
-              return (
-                <>
-                  <div key={index} className={`message-wrapper user`}>
-                    <div className="message user-message">{msg.text}</div>
-                  </div>
-                  <div className="message-wrapper bot">
-                    <img
-                      src="/img/bot_img.jpg"
-                      alt="Bot Avatar"
-                      className="bot-avatar"
-                    />
-                    <div className="message bot-message loading">
-                      Đang xử lý<span>.</span>
-                      <span>.</span>
-                      <span>.</span>
-                    </div>
-                  </div>
-                  <div className="plot-details">
-                    <div>
-                      <b>Prompt:</b> {msg.text}
-                    </div>
-                    <div>
-                      <b>Trạng thái:</b> Đang sinh code...
-                    </div>
-                  </div>
-                </>
-              );
+              return null;
             }
             if (msg.sender === "error") {
               return (
@@ -719,20 +700,37 @@ function App() {
               </div>
             );
           })}
-          {isLoading && (
-            <div className="message-wrapper bot">
-              <img
-                src="/img/bot_img.jpg"
-                alt="Bot Avatar"
-                className="bot-avatar"
-              />
-              <div className="message bot-message loading">
-                Đang xử lý<span>.</span>
-                <span>.</span>
-                <span>.</span>
-              </div>
-            </div>
-          )}
+          {isLoading &&
+            messages.length > 0 &&
+            messages[messages.length - 1].sender === "user" && (
+              <>
+                <div className={`message-wrapper user`}>
+                  <div className="message user-message">
+                    {messages[messages.length - 1].text}
+                  </div>
+                </div>
+                <div className="message-wrapper bot">
+                  <img
+                    src="/img/bot_img.jpg"
+                    alt="Bot Avatar"
+                    className="bot-avatar"
+                  />
+                  <div className="message bot-message loading">
+                    Đang xử lý<span>.</span>
+                    <span>.</span>
+                    <span>.</span>
+                  </div>
+                </div>
+                <div className="plot-details">
+                  <div>
+                    <b>Prompt:</b> {messages[messages.length - 1].text}
+                  </div>
+                  <div>
+                    <b>Trạng thái:</b> Đang sinh code...
+                  </div>
+                </div>
+              </>
+            )}
           <div ref={messagesEndRef} />
         </div>
         <form className="input-form" onSubmit={handleSubmit}>
