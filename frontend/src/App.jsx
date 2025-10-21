@@ -246,7 +246,7 @@ function App() {
             .message-wrapper {
               display: flex;
               align-items: flex-start;
-              margin-bottom: 0.5rem;
+              margin-top: 0.5rem;
               max-width: 75%;
               /* keep message height, don't shrink in flex list */
               flex: 0 0 auto;
@@ -259,6 +259,11 @@ function App() {
 
             .message-wrapper.bot {
               align-self: flex-start;
+              margin-bottom: 1rem;
+            }
+
+            .message-wrapper.bot + .message-wrapper.bot {
+              margin-top: 0.5rem;
             }
 
             .bot-avatar {
@@ -280,7 +285,6 @@ function App() {
               word-wrap: break-word;
               flex: 1;
               transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
-              cursor: pointer;
             }
 
             .user-message {
@@ -308,6 +312,18 @@ function App() {
             .app-container.dark .bot-message {
               background-color: var(--dark-bot-message-bg);
               color: var(--dark-text);
+            }
+
+            .plot-wrapper {
+              display: flex;
+              align-items: flex-start;
+              align-self: flex-start;
+              width: 100%;
+              margin-bottom: 1rem;
+            }
+
+            .plot-wrapper .bot-avatar {
+              margin-top: 0.5rem;
             }
 
             .plot-container {
@@ -449,29 +465,35 @@ function App() {
           {messages.map((msg, index) => {
             if (msg.sender === "plot") {
               return (
-                <div
-                  key={index}
-                  className={`plot-container ${
-                    fullscreenPlotIndex === index ? "fullscreen" : ""
-                  }`}
-                >
-                  <button
-                    className="zoom-button"
-                    onClick={() => toggleFullscreen(index)}
-                    title={
-                      fullscreenPlotIndex === index
-                        ? "Thoát toàn màn hình"
-                        : "Phóng to toàn màn hình"
-                    }
-                  >
-                    <MaximizeIcon />
-                    {fullscreenPlotIndex === index ? "Thu nhỏ" : "Zoom"}
-                  </button>
-                  <iframe
-                    title={`plot-${index}`}
-                    srcDoc={msg.html}
-                    className="plot-iframe"
+                <div key={index} className="plot-wrapper">
+                  <img
+                    src="/img/bot_img.jpg"
+                    alt="Bot Avatar"
+                    className="bot-avatar"
                   />
+                  <div
+                    className={`plot-container ${
+                      fullscreenPlotIndex === index ? "fullscreen" : ""
+                    }`}
+                  >
+                    <button
+                      className="zoom-button"
+                      onClick={() => toggleFullscreen(index)}
+                      title={
+                        fullscreenPlotIndex === index
+                          ? "Thoát toàn màn hình"
+                          : "Phóng to toàn màn hình"
+                      }
+                    >
+                      <MaximizeIcon />
+                      {fullscreenPlotIndex === index ? "Thu nhỏ" : "Zoom"}
+                    </button>
+                    <iframe
+                      title={`plot-${index}`}
+                      srcDoc={msg.html}
+                      className="plot-iframe"
+                    />
+                  </div>
                 </div>
               );
             }
