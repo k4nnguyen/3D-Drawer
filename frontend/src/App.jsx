@@ -57,6 +57,22 @@ const MaximizeIcon = () => (
   </svg>
 );
 
+const RetryIcon = () => (
+  <svg
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <polyline points="1 4 1 10 7 10" />
+    <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+  </svg>
+);
+
 function App() {
   const [theme, setTheme] = useState("dark");
   const [messages, setMessages] = useState([
@@ -72,6 +88,7 @@ function App() {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [fullscreenPlotIndex, setFullscreenPlotIndex] = useState(null);
+  const [retryIndex, setRetryIndex] = useState(null);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -82,26 +99,31 @@ function App() {
     setFullscreenPlotIndex(fullscreenPlotIndex === index ? null : index);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!inputValue.trim() || isLoading) return;
+  const handleRetry = (msg, index) => {
+    setRetryIndex(index);
+    setInputValue(msg.text || msg.failedPrompt || "");
+    handleSubmit(
+      { preventDefault: () => {} },
+      msg.text || msg.failedPrompt || ""
+    );
+  };
 
-    const userMessage = { sender: "user", text: inputValue };
+  const handleSubmit = async (e, customPrompt) => {
+    if (e) e.preventDefault();
+    const promptToSend = customPrompt !== undefined ? customPrompt : inputValue;
+    if (!promptToSend.trim() || isLoading) return;
+    const userMessage = { sender: "user", text: promptToSend };
     setMessages((prev) => [...prev, userMessage]);
     setInputValue("");
     setIsLoading(true);
-
     try {
       const response = await fetch("http://127.0.0.1:8000/generate-plot", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: inputValue }),
+        body: JSON.stringify({ prompt: promptToSend }),
       });
-
       const data = await response.json();
-
       if (response.ok && data.html) {
-        // SỬA LỖI: Đảm bảo canvas Plotly full màn hình trong iframe
         const fullHtml = `
                   <html>
                     <head>
@@ -138,22 +160,22 @@ function App() {
         setMessages((prev) => [...prev, botMessage]);
       } else {
         const errorMessage = {
-          sender: "bot",
-          text: `Rất tiếc, đã có lỗi: ${
-            data.detail || "Không thể xử lý yêu cầu."
-          }`,
+          sender: "error",
+          text: promptToSend,
+          failedPrompt: promptToSend,
         };
         setMessages((prev) => [...prev, errorMessage]);
       }
     } catch (error) {
-      console.error("Lỗi khi gọi API:", error);
       const errorMessage = {
-        sender: "bot",
-        text: "Không thể kết nối tới server. Vui lòng kiểm tra lại.",
+        sender: "error",
+        text: promptToSend,
+        failedPrompt: promptToSend,
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
+      setRetryIndex(null);
     }
   };
 
@@ -493,6 +515,46 @@ function App() {
                       srcDoc={msg.html}
                       className="plot-iframe"
                     />
+                  </div>
+                </div>
+              );
+            }
+            if (msg.sender === "error") {
+              return (
+                <div key={index} className="message-wrapper bot">
+                  <img
+                    src="/img/bot_img.jpg"
+                    alt="Bot Avatar"
+                    className="bot-avatar"
+                  />
+                  <div
+                    className="message bot-message error-message"
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: "0.5rem",
+                      background: "#ffeaea",
+                      color: "#c00",
+                      border: "1px solid #fbb",
+                      fontStyle: "italic",
+                    }}
+                  >
+                    Hệ thống gặp lỗi. Bạn hãy thử lại!
+                    <button
+                      className="retry-button"
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: 0,
+                        marginLeft: "0.5rem",
+                      }}
+                      title="Gửi lại yêu cầu này"
+                      onClick={() => handleRetry(msg, index)}
+                      disabled={isLoading}
+                    >
+                      <RetryIcon />
+                    </button>
                   </div>
                 </div>
               );
