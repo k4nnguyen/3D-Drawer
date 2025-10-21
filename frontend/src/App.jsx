@@ -89,6 +89,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [fullscreenPlotIndex, setFullscreenPlotIndex] = useState(null);
   const [retryIndex, setRetryIndex] = useState(null);
+  const [showCodeIndex, setShowCodeIndex] = useState(null);
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
@@ -156,7 +157,12 @@ function App() {
                     </body>
                   </html>
                 `;
-        const botMessage = { sender: "plot", html: fullHtml };
+        const botMessage = {
+          sender: "plot",
+          html: fullHtml,
+          code: data.code || "",
+          codeType: data.code_type || "python",
+        };
         setMessages((prev) => [...prev, botMessage]);
       } else {
         const errorMessage = {
@@ -213,6 +219,21 @@ function App() {
               transition: background-color 0.3s, color 0.3s;
               overflow: hidden;
             }
+             .plot-details {
+               background: #f8f8ff;
+               color: #333;
+               border-radius: 8px;
+               margin: 0.5rem 0 0.5rem 56px;
+               padding: 0.75rem 1rem;
+               font-size: 0.95rem;
+               box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+               border: 1px solid #e0e0e0;
+             }
+             .app-container.dark .plot-details {
+               background: #222;
+               color: #eee;
+               border: 1px solid #333;
+             }
 
             .app-container.light {
               background-color: var(--light-bg);
@@ -486,6 +507,14 @@ function App() {
         <div className="messages-container">
           {messages.map((msg, index) => {
             if (msg.sender === "plot") {
+              // Tìm prompt user liền trước plot
+              let promptDetail = "";
+              for (let i = index - 1; i >= 0; i--) {
+                if (messages[i].sender === "user") {
+                  promptDetail = messages[i].text;
+                  break;
+                }
+              }
               return (
                 <div key={index} className="plot-wrapper">
                   <img
@@ -516,7 +545,87 @@ function App() {
                       className="plot-iframe"
                     />
                   </div>
+                  <div className="plot-details">
+                    <div>
+                      <b>Prompt:</b> {promptDetail || "Không xác định"}
+                    </div>
+                    <div>
+                      <b>Trạng thái:</b> Đã tạo mô hình 3D thành công
+                    </div>
+                    {msg.code && msg.code.trim() && (
+                      <>
+                        <button
+                          style={{
+                            marginTop: "0.5rem",
+                            padding: "0.3rem 0.8rem",
+                            borderRadius: "6px",
+                            border: "1px solid #bbb",
+                            background: "#f0f0f0",
+                            cursor: "pointer",
+                          }}
+                          onClick={() =>
+                            setShowCodeIndex(
+                              showCodeIndex === index ? null : index
+                            )
+                          }
+                        >
+                          {showCodeIndex === index
+                            ? "Ẩn code"
+                            : "Hiển thị code"}
+                        </button>
+                        {showCodeIndex === index && (
+                          <pre
+                            style={{
+                              marginTop: "0.5rem",
+                              background: "#222",
+                              color: "#eee",
+                              padding: "1rem",
+                              borderRadius: "8px",
+                              overflowX: "auto",
+                            }}
+                          >
+                            <code>{msg.code}</code>
+                          </pre>
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
+              );
+            }
+            // Hiển thị trạng thái khi đang loading (sinh code)
+            if (
+              isLoading &&
+              !messages.some((m) => m.sender === "plot") &&
+              index === messages.length - 1 &&
+              msg.sender === "user"
+            ) {
+              return (
+                <>
+                  <div key={index} className={`message-wrapper user`}>
+                    <div className="message user-message">{msg.text}</div>
+                  </div>
+                  <div className="message-wrapper bot">
+                    <img
+                      src="/img/bot_img.jpg"
+                      alt="Bot Avatar"
+                      className="bot-avatar"
+                    />
+                    <div className="message bot-message loading">
+                      Đang xử lý<span>.</span>
+                      <span>.</span>
+                      <span>.</span>
+                    </div>
+                  </div>
+                  <div className="plot-details">
+                    <div>
+                      <b>Prompt:</b> {msg.text}
+                    </div>
+                    <div>
+                      <b>Trạng thái:</b> Đang sinh code...
+                    </div>
+                  </div>
+                </>
               );
             }
             if (msg.sender === "error") {
@@ -555,6 +664,15 @@ function App() {
                     >
                       <RetryIcon />
                     </button>
+                  </div>
+                  <div className="plot-details">
+                    <div>
+                      <b>Prompt:</b>{" "}
+                      {msg.text || msg.failedPrompt || "Không xác định"}
+                    </div>
+                    <div>
+                      <b>Trạng thái:</b> Lỗi khi sinh code
+                    </div>
                   </div>
                 </div>
               );

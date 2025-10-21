@@ -133,7 +133,7 @@ async def generate_plot(request: PromptRequest):
     7. Yêu cầu với các khối cần đặt trên một nền đen, ngoài ra cũng cần có các lưới màu trắng theo trục X và Y để có thể tương phản.
     8. Yêu cầu phần trục nên có các số là chiều cao và dài để giống đồ thị.
     9. Với các loại hình học: Hình tròn, hình tam giác, hình hộp, ... Thì sẽ phải vẽ ra khối 3D của nó.
-    10. Các loại hình khối nên là khối đặc, lớp ngoài không có trong suốt.
+    10. Các loại hình khối nên là khối đặc, lớp ngoài không có trong suốt, vẽ các khối nên đổ bóng để nhìn cho dễ.
     Yêu cầu: "{request.prompt}"
     """
     try:
@@ -182,7 +182,12 @@ async def generate_plot(request: PromptRequest):
                 modeBarButtonsToRemove=["lasso2d", "select2d", "toggleSpikelines"],
             )
             plot_html = fig.to_html(full_html=False, include_plotlyjs='cdn', config=config)
-            return {"html": plot_html}
+            # Trả về cả code Python cho frontend
+            return {
+                "html": plot_html,
+                "code": generated_code,
+                "code_type": "python"
+            }
         else:
             raise HTTPException(status_code=400, detail="Mã do AI tạo ra không hợp lệ hoặc không tạo ra đối tượng 'fig'.")
 
